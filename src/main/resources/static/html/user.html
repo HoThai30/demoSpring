@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title> User</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/css/user.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">
+        <ul class="navbar-menu">
+            <li><a href="/html/user.html"> User </a> </li>
+            <li><a href="/html/product.html"> Product </a> </li>
+            <li><a href="/html/createUser.html"> Create </a> </li>
+            <li><a href="/html/updateUser.html"> Update </a> </li>
+
+
+        </ul>
+    </div>
+</nav>
+
+<h2>Danh sách User</h2>
+<table id="userTable">
+    <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+</table>
+
+<hr>
+<script>
+
+    $(document).ready(function() {
+        const API_BASE = "/user";
+
+        function getToken(){
+            return localStorage.getItem("jwtToken");
+        }
+        const token = localStorage.getItem("jwtToken");
+        if (!getToken()) {
+            alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        function getAuthHeaders(){
+            const token = getToken();
+            return token ? {
+                "Authorization": "Bearer " + token
+            } : {};
+
+        }
+
+
+        function loadUsers() {
+
+            $.ajax({
+                url: API_BASE + "/get",
+                method: "GET",
+                headers: getAuthHeaders(),
+                success: function(users) {
+                    let html = "";
+                    users.forEach(user => {
+                        html += `<tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.address}</td>
+                        <td>
+                          <button class="deleteBtn" data-id="${user.id}">Delete</button>
+                          <button class="loadBtn" onclick="window.location.href='/html/updateUser.html?id=${user.id}'">Update</button>
+
+                        </td>
+                      </tr>`;
+                    });
+                    $("#userTable tbody").html(html);
+                },
+                error: function(xhr) {
+                    if(xhr.status === 401){
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại ha.");
+                        window.location.href = "/html/login.html";  // Chuyển về trang login
+                    } else {
+                        alert("Lỗi khi tải danh sách user.");
+                    }
+                }
+            });
+        }
+
+        loadUsers();
+
+
+        $(document).on("click", ".deleteBtn", function() {
+            if (!confirm("Bạn có chắc muốn xoá user này không?")) return;
+            const id = $(this).data("id");
+
+            $.ajax({
+                url: API_BASE + "/delete?id=" + id,
+                method: "DELETE",
+                headers: getAuthHeaders(),
+                success: function(res) {
+                    alert(res);
+                    loadUsers();
+                },
+                error: function(xhr) {
+                    if(xhr.status === 401){
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại di.");
+                        window.location.href = "/html/login.html";
+                    } else {
+                        alert("Lỗi khi xoá user.");
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+
+</body>
+</html>

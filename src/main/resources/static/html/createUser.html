@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create</title>
+    <link rel="stylesheet" href="/css/user.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">
+        <ul class="navbar-menu">
+            <li><a href="/html/user.html"> User </a> </li>
+            <li><a href="/html/product.html"> Product </a> </li>
+            <li><a href="/html/updateUser.html"> Update </a> </li>
+
+        </ul>
+    </div>
+</nav>
+
+<h2>Thêm User mới</h2>
+<form id="createUserForm">
+    <label>Username: <input type="text" name="username" required /></label><br/>
+    <label>Password: <input type="password" name="password" required /></label><br/>
+    <label>Email: <input type="email" name="email" required /></label><br/>
+    <label>Phone: <input type="text" name="phone" /></label><br/>
+    <label>Address: <input type="text" name="address" /></label><br/>
+    <button type="submit">Create</button>
+</form>
+
+<script>
+    $(document).ready(function() {
+        const API_BASE = "/user";
+        console.log("Token hiện tại:", localStorage.getItem("jwtToken"));
+
+        function getToken() {
+            return localStorage.getItem("jwtToken");
+        }
+
+        if (!getToken()) {
+            alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        function getAuthHeaders() {
+            return {
+                "Authorization": "Bearer " + getToken()
+            };
+        }
+
+        $("#createUserForm").submit(function(e) {
+            e.preventDefault();
+            const data = {
+                userName: $(this).find("input[name='username']").val(),
+                password: $(this).find("input[name='password']").val(),
+                email: $(this).find("input[name='email']").val(),
+                phone: $(this).find("input[name='phone']").val(),
+                address: $(this).find("input[name='address']").val()
+            };
+
+            $.ajax({
+                url: API_BASE + "/create",
+                method: "POST",
+                contentType: "application/json",
+                headers: getAuthHeaders(),
+                data: JSON.stringify(data),
+                success: function(res) {
+                    alert("Tạo user thành công!");
+                    window.location.href = "/user.html";
+                    // $("#createUserForm")[0].reset();
+                },
+                error: function(xhr) {
+                    if(xhr.status === 401){
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+                        window.location.href = "login.html";
+                    } else {
+                        alert("Lỗi khi tạo user.");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

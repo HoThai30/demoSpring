@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đăng nhập</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+
+
+<div class="login-container">
+<form id="loginForm">
+  <h2>Đăng nhập</h2>
+
+  <div class="input-group">
+  <label>Username</label>
+  <input type="text" name="username" required />
+
+  <label>Password</label>
+  <input type="password" name="password" required />
+  </div>
+  <button type="submit">Đăng nhập</button>
+
+  <div id="loginStatus"></div>
+</form>
+</div>
+
+
+<script>
+  $(document).ready(function() {
+    $("#loginForm").submit(function(e) {
+      e.preventDefault();
+
+      const data = {
+        username: $(this).find("input[name='username']").val(),
+        password: $(this).find("input[name='password']").val()
+      };
+
+      $.ajax({
+        url: "/auth/login",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function(res) {
+          // console.log("Phản hồi từ server:", res);
+          if(res.token){
+            localStorage.setItem("jwtToken", res.token);
+            $("#loginStatus").css("color", "green").text("Đăng nhập thành công! Đang chuyển trang...");
+            setTimeout(() => {
+              window.location.href = "user.html";
+             //   window.location.href = "product.html";
+            }, 1000);
+          } else {
+            $("#loginStatus").text("Không nhận được token từ server.");
+          }
+        },
+        error: function(xhr) {
+          if(xhr.status === 401){
+            $("#loginStatus").text("Sai tên đăng nhập hoặc mật khẩu.");
+          } else {
+            $("#loginStatus").text("Lỗi khi đăng nhập, vui lòng thử lại.");
+          }
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

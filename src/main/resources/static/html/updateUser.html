@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update</title>
+    <link rel="stylesheet" href="/css/user.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">
+        <ul class="navbar-menu">
+            <li><a href="/html/user.html"> User </a> </li>
+            <li><a href="/html/createUser.html"> Create </a> </li>
+
+        </ul>
+    </div>
+</nav>
+
+<h2>Cập nhật User</h2>
+<hr>
+<form id="updateUserForm">
+    <label>ID: <input type="number" name="id" required /></label><br/>
+    <label>Password: <input type="password" name="password" required /></label><br/>
+    <label>Email: <input type="email" name="email" /></label><br/>
+    <label>Phone: <input type="text" name="phone" /></label><br/>
+    <label>Address: <input type="text" name="address" /></label><br/>
+    <button type="submit">Update</button>
+</form>
+<hr>
+<script>
+    $(document).ready(function() {
+        const API_BASE = "/user";
+        console.log("Token hiện tại:", localStorage.getItem("jwtToken"));
+
+        function getToken() {
+            return localStorage.getItem("jwtToken");
+        }
+
+        if (!getToken()) {
+            alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        function getAuthHeaders() {
+            return {
+                "Authorization": "Bearer " + getToken()
+            };
+        }
+
+        // Load user lên form update
+        $(document).on("click", ".loadBtn", function() {
+            const id = $(this).data("id");
+            $.ajax({
+                url: API_BASE + "/getById?id=" + id,
+                method: "GET",
+                headers: getAuthHeaders(),
+                success: function(user) {
+                    $("#updateUserForm input[name='id']").val(user.id);
+                    $("#updateUserForm input[name='username']").val(user.username);
+                    $("#updateUserForm input[name='password']").val(user.password);
+                    $("#updateUserForm input[name='email']").val(user.email);
+                    $("#updateUserForm input[name='phone']").val(user.phone);
+                    $("#updateUserForm input[name='address']").val(user.address);
+                },
+                error: function(xhr) {
+                    if(xhr.status === 401){
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn.Đăng nhập lại.");
+                        window.location.href = "/html/login.html";
+                    } else {
+                        alert("Không tìm thấy user");
+                    }
+                }
+            });
+        });
+
+    $("#updateUserForm").submit(function(e) {
+        e.preventDefault();
+        const id = $(this).find("input[name='id']").val();
+        const data = {
+
+            password: $(this).find("input[name='password']").val(),
+            email: $(this).find("input[name='email']").val(),
+            phone: $(this).find("input[name='phone']").val(),
+            address: $(this).find("input[name='address']").val()
+
+        };
+
+        $.ajax({
+            url: API_BASE + "/update?id=" + id,
+            method: "PUT",
+            contentType: "application/json",
+            headers: getAuthHeaders(),
+            data: JSON.stringify(data),
+            success: function (res) {
+                alert("Cập nhật user thành công!");
+                window.location.href = "/html/user.html";
+                //$("#updateUserForm")[0].reset();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    alert("Bạn chưa đăng nhập hoặc token hết hạn. Đăng nhập lại.");
+                    window.location.href = "/html/login.html";
+                } else {
+                    alert("Lỗi khi cập nhật user.");
+                }
+               }
+            });
+        });
+    });
+</script>
+</body>
+</html>

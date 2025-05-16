@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product</title>
+    <link rel="stylesheet" href="/css/user.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="navbar-logo">
+        <ul class="navbar-menu">
+            <li><a href="/html/user.html"> User </a> </li>
+            <li><a href="/html/product.html"> Product </a> </li>
+
+        </ul>
+    </div>
+</nav>
+
+<br>
+
+<h2>List product</h2>
+<table id="productTable">
+    <thead><tr><th>ID</th><th>Category</th><th>Name</th><th>Price</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+</table>
+
+
+<script>
+    $(document).ready(function () {
+        const API_BASE = "/product";
+        console.log("Token lấy từ localStorage:", getToken());
+        function getToken(){
+            return localStorage.getItem("jwtToken");
+        }
+        const token = localStorage.getItem("jwtToken");
+        if (!getToken()) {
+            alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+            window.location.href = "login.html";
+            return;
+        }
+        function getAuthHeaders(){
+            const token = getToken();
+            return token ? {
+                "Authorization": "Bearer " + token
+            } : {};
+
+        }
+
+        function loadProducts() {
+
+            $.ajax({
+                url: API_BASE + "/getproduct",
+                method: "GET",
+                headers: getAuthHeaders(),
+                success: function(products) {
+                    let html = "";
+                    products.forEach(product => {
+                        html += `<tr>
+                        <td>${product.id}</td>
+                        <td>${product.category}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>
+                          <button class="deleteBtn" data-id="${product.id}">Xoá</button>
+                          <button class="loadBtn" data-id="${product.id}">Chỉnh sửa</button>
+                        </td>
+                      </tr>`;
+                    });
+                    $("#productTable tbody").html(html);
+                },
+                error: function(xhr) {
+                    if(xhr.status === 401){
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại ha.");
+                        window.location.href = "/html/login.html";  // Chuyển về trang login
+                    } else {
+                        alert("Lỗi khi tải danh sách user.");
+                    }
+                }
+            });
+        }
+
+         loadProducts();
+
+    });
+</script>
+</body>
+</html>
