@@ -3,9 +3,10 @@ package com.example.vmall.Service;
 import com.example.vmall.Entity.Product;
 import com.example.vmall.Repository.ProductRepository;
 import com.example.vmall.dto.Request.ProductCreate;
-import jdk.jfr.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class ProductService {
     public List<Product> getAllProducts(){
         return productRepository.findAll();
     }
+
+
     public List<Product> getProductByCategory(String  category) {
         List<Product> products = productRepository.findByCategory(category);
         if(products.isEmpty())throw new RuntimeException("404 not found"+category);
@@ -44,6 +47,14 @@ public class ProductService {
     public void delete(int id){
         Product product = getProductById(id);
         productRepository.deleteById(id);
+    }
+
+    public List<Product> searchProduct(String keyword){
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(keyword);
+        if (products.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No products found with keyword: \"" + keyword + "\"");
+        }
+        return products;
     }
 
 

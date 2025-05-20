@@ -24,12 +24,15 @@ public class SercurityConfig {
                 .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/auth/login",
                                             "/user/create",
-                                             "/favicon.ico",
                                             "/html/**",
                                             "/css/**",
                                             "/js/**").permitAll()
+//                            .requestMatchers(HttpMethod.GET, "/product/**").hasAnyRole("USER", "ADMIN")
+//                            .requestMatchers(HttpMethod.POST, "/product/**").hasAnyRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
+
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")) // Gửi mã lỗi 401

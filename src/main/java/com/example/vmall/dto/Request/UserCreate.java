@@ -6,6 +6,7 @@ public class UserCreate {
     private String email;
     private String phone;
     private String address;
+    private String role;
 
 
     public String getUserName() {
@@ -46,5 +47,13 @@ public class UserCreate {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

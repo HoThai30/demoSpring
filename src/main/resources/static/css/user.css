@@ -144,6 +144,9 @@ form button[type="submit"] {
 form button[type="submit"]:hover {
     background-color: #5a67d8;
 }
+.searchForm{
+    margin: 0 auto;
+}
 
 
 @media (max-width: 768px) {

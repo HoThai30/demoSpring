@@ -1,6 +1,8 @@
 package com.example.vmall.Service;
 
 import com.example.vmall.Entity.User;
+import com.example.vmall.Entity.Role;
+import com.example.vmall.Repository.RoleRepository;
 import com.example.vmall.Repository.UserRepository;
 import com.example.vmall.Sercurity.SercurityConfig;
 import com.example.vmall.dto.Request.UserCreate;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +28,8 @@ public class UserService {
         return userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword());
     }
 
+    @Autowired
+    private RoleRepository roleRepository;
     public User Create(UserCreate request){
         User user = new User();
         user.setUsername(request.getUserName());
@@ -32,7 +37,17 @@ public class UserService {
         user.setAddress(request.getAddress());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
+
+
+        // Lấy role từ request (mặc định là USER nếu không có)
+        String roleName = (request.getRole() == null || request.getRole().isBlank()) ? "USER" : request.getRole().toUpperCase();
+
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role không tồn tại: " + roleName));
+        user.setRole(Collections.singleton(role));
+
         userRepository.save(user);
+
         return user;
     }
     public List<User> getAllUsers(){
@@ -53,6 +68,8 @@ public class UserService {
         User user = getUserById(id);
         userRepository.deleteById(id);
     }
+
+
 
 
 }

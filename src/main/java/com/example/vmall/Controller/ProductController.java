@@ -23,16 +23,20 @@ public class ProductController {
         return productService.getAllProducts();
     }
     @GetMapping("/getproductByCategory")
-    public List<Product> getProductByCategory(String category){
+    public List<Product> getProductByCategory(@RequestParam("category") String category){
         return productService.getProductByCategory(category);
     }
     @PostMapping("/update")
-    public Product update(int id,@RequestBody ProductCreate request){
+    public Product update(@PathVariable int id,@RequestBody ProductCreate request){
         return productService.update(id, request);
     }
     @DeleteMapping("/delete")
-    String delete(int id){
+    String delete(@PathVariable int id){
         productService.delete(id);
         return "success";
+    }
+    @GetMapping("/search")
+    public List<Product> searchProduct(@RequestParam("keyword") String keyword){
+        return productService.searchProduct(keyword);
     }
 }

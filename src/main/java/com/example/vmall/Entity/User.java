@@ -2,6 +2,8 @@ package com.example.vmall.Entity;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name ="userdetail")
 public class User {
@@ -12,6 +14,9 @@ public class User {
     private String email;
     private String phone;
     private String address;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> role;
 
     public User() {
     }
@@ -24,6 +29,7 @@ public class User {
         this.phone = phone;
         this.address = address;
     }
+
 
     public int getId() {
         return id;
@@ -71,5 +77,13 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Set<Role> getRole() {
+        return role;
+    }
+
+    public void setRole(Set<Role> role) {
+        this.role = role;
     }
 }

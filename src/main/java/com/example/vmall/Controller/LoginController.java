@@ -26,7 +26,7 @@ public class LoginController {
    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         boolean authenticated = userService.authenticate(request.getUsername(), request.getPassword());
         if (authenticated) {
-            String token = jwtUtil.generateToken(request.getUsername());
+              String token = jwtUtil.generateToken(request.getUsername());
 //            model.addAttribute("token", token);
            return ResponseEntity.ok(new LoginRespone("Login successful", token));
         } else {

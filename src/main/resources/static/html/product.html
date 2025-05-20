@@ -22,6 +22,12 @@
 </nav>
 
 <br>
+<form class="searchForm">
+    <input type="text" id="searchInput" placeholder="Nhập tên sản phẩm">
+    <button type="submit">Tìm kiếm</button>
+</form>
+
+<br>
 
 <h2>List product</h2>
 <table id="productTable">
@@ -78,13 +84,55 @@
                         alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại ha.");
                         window.location.href = "/html/login.html";  // Chuyển về trang login
                     } else {
-                        alert("Lỗi khi tải danh sách user.");
+                        alert("Lỗi khi tải danh sách product.");
                     }
                 }
             });
         }
-
          loadProducts();
+
+    // Gọi API tìm kiếm
+    function searchProducts(keyword) {
+        $.ajax({
+            url: API_BASE + "/search?keyword=" + encodeURIComponent(keyword),
+            method: "GET",
+            headers: getAuthHeaders(),
+            success: function(products) {
+                let html = "";
+                products.forEach(product => {
+                    html += `<tr>
+                    <td>${product.id}</td>
+                    <td>${product.category}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>
+                      <button class="deleteBtn" data-id="${product.id}">Xoá</button>
+                      <button class="loadBtn" data-id="${product.id}">Chỉnh sửa</button>
+                    </td>
+                  </tr>`;
+                });
+                $("#productTable tbody").html(html);
+            },
+            error: function(xhr) {
+                if (xhr.status === 404) {
+                    $("#productTable tbody").html("<tr><td colspan='5'>Không tìm thấy sản phẩm phù hợp.</td></tr>");
+                } else {
+                    alert("Lỗi khi tìm kiếm sản phẩm.");
+                }
+            }
+        });
+    }
+
+        // Bắt sự kiện submit form tìm kiếm
+        $(".searchForm").on("submit", function (e) {
+            e.preventDefault();
+            const keyword = $(".searchInput").val().trim();
+            if (keyword) {
+                searchProducts(keyword);
+            } else {
+                loadProducts();
+            }
+        });
 
     });
 </script>

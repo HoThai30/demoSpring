@@ -26,6 +26,8 @@
     <label>Email: <input type="email" name="email" required /></label><br/>
     <label>Phone: <input type="text" name="phone" /></label><br/>
     <label>Address: <input type="text" name="address" /></label><br/>
+    <label>Role: <input type="text" name="role" /></label><br/>
+
     <button type="submit">Create</button>
 </form>
 
@@ -39,7 +41,7 @@
         }
 
         if (!getToken()) {
-            alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+            alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.ở create");
             window.location.href = "login.html";
             return;
         }
@@ -57,7 +59,9 @@
                 password: $(this).find("input[name='password']").val(),
                 email: $(this).find("input[name='email']").val(),
                 phone: $(this).find("input[name='phone']").val(),
-                address: $(this).find("input[name='address']").val()
+                address: $(this).find("input[name='address']").val(),
+                role: $(this).find("input[name='role']").val()
+
             };
 
             $.ajax({
@@ -68,12 +72,12 @@
                 data: JSON.stringify(data),
                 success: function(res) {
                     alert("Tạo user thành công!");
-                    window.location.href = "/user.html";
+                    window.location.href = "/html/user.html";
                     // $("#createUserForm")[0].reset();
                 },
                 error: function(xhr) {
                     if(xhr.status === 401){
-                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.");
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.create");
                         window.location.href = "login.html";
                     } else {
                         alert("Lỗi khi tạo user.");
