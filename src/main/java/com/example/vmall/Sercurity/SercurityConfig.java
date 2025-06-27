@@ -3,8 +3,10 @@ package com.example.vmall.Sercurity;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SercurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
@@ -23,14 +26,14 @@ public class SercurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/auth/login",
-                                            "/user/create",
+                                          //  "/user/create",
                                             "/html/**",
                                             "/css/**",
                                             "/js/**").permitAll()
-//                            .requestMatchers(HttpMethod.GET, "/product/**").hasAnyRole("USER", "ADMIN")
-//                            .requestMatchers(HttpMethod.POST, "/product/**").hasAnyRole("ADMIN")
-
-                        .anyRequest().authenticated()
+                            .requestMatchers(HttpMethod.POST, "/product/**").hasRole("ADMIN")
+//                           ?? .requestMatchers(HttpMethod.GET, "/user/**").hasRole("ADMIN")
+//
+                            .anyRequest().authenticated()
                 )
 
                 .exceptionHandling(e -> e

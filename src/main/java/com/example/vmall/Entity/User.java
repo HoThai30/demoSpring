@@ -15,19 +15,19 @@ public class User {
     private String phone;
     private String address;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> role;
+    private Set<String> roles;
 
     public User() {
     }
 
-    public User(int id, String username, String password, String email, String phone, String address) {
+    public User(int id, String username, String password, String email, String phone, String address,Set<String> roles) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
         this.phone = phone;
         this.address = address;
+        this.roles = roles;
     }
 
 
@@ -79,11 +79,11 @@ public class User {
         this.address = address;
     }
 
-    public Set<Role> getRole() {
-        return role;
+    public Set<String> getRoles() {
+        return roles;
     }
 
-    public void setRole(Set<Role> role) {
-        this.role = role;
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 }

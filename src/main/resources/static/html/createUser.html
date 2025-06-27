@@ -11,9 +11,9 @@
 <nav class="navbar">
     <div class="navbar-logo">
         <ul class="navbar-menu">
-            <li><a href="/html/user.html"> User </a> </li>
-            <li><a href="/html/product.html"> Product </a> </li>
-            <li><a href="/html/updateUser.html"> Update </a> </li>
+            <li><a href="/html/user.html"> User list </a> </li>
+            <li><a href="/html/product.html"> Product list </a> </li>
+            <li><a href="/html/updateUser.html"> Update user </a> </li>
 
         </ul>
     </div>
@@ -34,7 +34,7 @@
 <script>
     $(document).ready(function() {
         const API_BASE = "/user";
-        console.log("Token hiện tại:", localStorage.getItem("jwtToken"));
+      //  console.log("Token hiện tại:", localStorage.getItem("jwtToken"));
 
         function getToken() {
             return localStorage.getItem("jwtToken");

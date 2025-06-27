@@ -10,5 +10,8 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product,Integer> {
     List<Product> findByCategory(String category);
 
-    List<Product> findByNameContainingIgnoreCase(String keyword);
+    List<Product> findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(String keyword1, String keyword2);
+
+    List<Product> findByPriceBetween(Double priceMin, Double priceMax);
+
 }

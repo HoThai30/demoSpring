@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create</title>
+  <link rel="stylesheet" href="/css/user.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-logo">
+    <ul class="navbar-menu">
+      <li><a href="/html/user.html"> User list </a> </li>
+      <li><a href="/html/product.html"> Product list </a> </li>
+      <li><a href="/html/updateproduct.html"> Update product </a> </li>
+
+    </ul>
+  </div>
+</nav>
+
+<h2>Thêm User mới</h2>
+<form id="createProductForm">
+  <label>category: <input type="text" name="category" required /></label><br/>
+  <label>name: <input type="text" name="name" required /></label><br/>
+  <label>Price: <input type="number" name="price" step="0.01" min="0" required /></label><br/>
+
+  <button type="submit">Create</button>
+</form>
+
+<script>
+      $(document).ready(function() {
+        const API_BASE = "/product";
+        //  console.log("Token hiện tại:", localStorage.getItem("jwtToken"));
+
+        function getToken() {
+          return localStorage.getItem("jwtToken");
+        }
+
+        if (!getToken()) {
+          alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.ở create");
+          window.location.href = "login.html";
+          return;
+        }
+
+        function getAuthHeaders() {
+          return {
+            "Authorization": "Bearer " + getToken()
+          };
+        }
+
+        $("#createProductForm").submit(function(e) {
+          e.preventDefault();
+          const data = {
+            category: $(this).find("input[name='category']").val(),
+            name: $(this).find("input[name='name']").val(),
+            price: $(this).find("input[name='price']").val(),
+
+          };
+
+          $.ajax({
+            url: API_BASE + "/create",
+            method: "POST",
+            contentType: "application/json",
+            headers: getAuthHeaders(),
+            data: JSON.stringify(data),
+            success: function(res) {
+              alert("Tạo thành công!");
+              window.location.href = "/html/product.html";
+              // $("#createUserForm")[0].reset();
+            },
+            error: function(xhr) {
+              if(xhr.status === 401){
+                alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại.create");
+                window.location.href = "login.html";
+              } else {
+                alert("Lỗi khi tạo user.");
+              }
+            }
+          });
+        });
+      });
+</script>
+
+</body>
+</html>

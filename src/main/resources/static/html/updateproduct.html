@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Update</title>
+  <link rel="stylesheet" href="/css/user.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    label { display: block; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-logo">
+    <ul class="navbar-menu">
+      <li><a href="/html/user.html"> User List </a></li>
+      <li><a href="/html/product.html"> Product List </a></li>
+      <li><a href="/html/createproduct.html"> Create Product </a></li>
+    </ul>
+  </div>
+</nav>
+
+<h2>Cập nhật Product</h2>
+<hr>
+
+<form id="updateProductForm">
+  <label>category: <input type="text" name="category" required /></label><br/>
+  <label>name: <input type="text" name="name" required /></label><br/>
+  <label>Price: <input type="number" name="price" step="0.01" min="0" required /></label><br/>
+
+  <button type="submit">Update</button>
+</form>
+
+<hr>
+
+<script>
+      $(document).ready(function() {
+        const API_BASE = "/product";
+
+        function getToken() {
+          return localStorage.getItem("jwtToken");
+        }
+
+        function getAuthHeaders() {
+          return {
+            "Authorization": "Bearer " + getToken()
+          };
+        }
+
+        if (!getToken()) {
+          alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại di.");
+          window.location.href = "/html/login.html";
+          return;
+        }
+
+        // Lấy id từ URL query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        if (!id) {
+          alert("Không tìm thấy ID user để cập nhật!");
+          window.location.href = "/html/product.html";
+          return;
+        }
+
+        // Gọi API lấy dữ liệu user theo id và đổ lên form
+        $.ajax({
+          url: `${API_BASE}/getproductById?id=${id}`,
+          method: "GET",
+          headers: getAuthHeaders(),
+          success: function(product) {
+
+            $("#updateProductForm input[name='category']").val(product.category);
+            $("#updateProductForm input[name='name']").val(product.name);
+            $("#updateProductForm input[name='price']").val(product.price);
+
+          },
+          error: function(xhr) {
+            if (xhr.status === 401) {
+              alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại 1.");
+              window.location.href = "/html/login.html";
+            } else {
+              alert("Không tìm thấy user hoặc lỗi khi tải dữ liệu.");
+              window.location.href = "/html/user.html";
+            }
+          }
+        });
+
+        // Xử lý submit form cập nhật
+        $("#updateProductForm").submit(function(e) {
+          e.preventDefault();
+
+          const data = {
+            category: $(this).find("input[name='category']").val(),
+            name: $(this).find("input[name='name']").val(),
+            price: $(this).find("input[name='price']").val(),
+          };
+
+          $.ajax({
+            url: `${API_BASE}/update/${id}`,
+            method: "POST",
+            contentType: "application/json",
+            headers: getAuthHeaders(),
+            data: JSON.stringify(data),
+            success: function() {
+              alert("Cập nhật product thành công!");
+              window.location.href = "/html/product.html";
+            },
+            error: function(xhr) {
+              if (xhr.status === 401) {
+                alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại. chổ ni");
+                window.location.href = "/html/login.html";
+              } else {
+                alert("Lỗi khi cập nhật.");
+              }
+            }
+          });
+        });
+  });
+</script>
+
+</body>
+</html>

@@ -1,17 +1,17 @@
 package com.example.vmall.Service;
 
 import com.example.vmall.Entity.User;
-import com.example.vmall.Entity.Role;
-import com.example.vmall.Repository.RoleRepository;
+import com.example.vmall.Enums.Role;
 import com.example.vmall.Repository.UserRepository;
-import com.example.vmall.Sercurity.SercurityConfig;
 import com.example.vmall.dto.Request.UserCreate;
 import com.example.vmall.dto.Request.UserUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +28,6 @@ public class UserService {
         return userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword());
     }
 
-    @Autowired
-    private RoleRepository roleRepository;
     public User Create(UserCreate request){
         User user = new User();
         user.setUsername(request.getUserName());
@@ -38,21 +36,20 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
 
-
-        // Lấy role từ request (mặc định là USER nếu không có)
-        String roleName = (request.getRole() == null || request.getRole().isBlank()) ? "USER" : request.getRole().toUpperCase();
-
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role không tồn tại: " + roleName));
-        user.setRole(Collections.singleton(role));
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.USER.name());
+        user.setRoles(roles);
 
         userRepository.save(user);
-
         return user;
     }
+
+   // @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
+
+
     public User getUserById(Integer id){
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("404 Not Found"+ id));
     }

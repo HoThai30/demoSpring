@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Product</title>
-    <link rel="stylesheet" href="/css/user.css">
+    <link rel="stylesheet" href="/css/product.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
@@ -14,8 +14,10 @@
 <nav class="navbar">
     <div class="navbar-logo">
         <ul class="navbar-menu">
-            <li><a href="/html/user.html"> User </a> </li>
-            <li><a href="/html/product.html"> Product </a> </li>
+            <li><a href="/html/user.html"> User list </a> </li>
+            <li><a href="/html/product.html"> Product list </a> </li>
+            <li><a href="/html/createProduct.html"> Create product </a> </li>
+            <li><a href="/html/updateProduct.html"> Update product </a> </li>
 
         </ul>
     </div>
@@ -24,8 +26,14 @@
 <br>
 <form class="searchForm">
     <input type="text" id="searchInput" placeholder="Nhập tên sản phẩm">
-    <button type="submit">Tìm kiếm</button>
+    <button type="submit">Search</button>
 </form>
+
+<div class="filters">
+    <input type="number" id="minPrice" placeholder="Giá tối thiểu">
+    <input type="number" id="maxPrice" placeholder="Giá tối đa">
+    <button id="filterBtn" type="button">Filter</button>
+</div>
 
 <br>
 
@@ -39,7 +47,7 @@
 <script>
     $(document).ready(function () {
         const API_BASE = "/product";
-        console.log("Token lấy từ localStorage:", getToken());
+        //console.log("Token lấy từ localStorage:", getToken());
         function getToken(){
             return localStorage.getItem("jwtToken");
         }
@@ -73,7 +81,8 @@
                         <td>${product.price}</td>
                         <td>
                           <button class="deleteBtn" data-id="${product.id}">Xoá</button>
-                          <button class="loadBtn" data-id="${product.id}">Chỉnh sửa</button>
+                          <button class="loadBtn" onclick="window.location.href='/html/updateproduct.html?id=${product.id}'">Update</button>
+
                         </td>
                       </tr>`;
                     });
@@ -90,6 +99,29 @@
             });
         }
          loadProducts();
+
+        $(document).on("click", ".deleteBtn", function() {
+            if (!confirm("Bạn có chắc muốn xoá product này không?")) return;
+            const id = $(this).data("id");
+
+            $.ajax({
+                url: API_BASE + "/delete?id=" + id,
+                method: "DELETE",
+                headers: getAuthHeaders(),
+                success: function(res) {
+                    alert(res);
+                    loadProducts();
+                },
+                error: function(xhr) {
+                    if(xhr.status === 401){
+                        alert("Bạn chưa đăng nhập hoặc token hết hạn. Vui lòng đăng nhập lại di.");
+                        window.location.href = "/html/login.html";
+                    } else {
+                        alert("Lỗi khi xoá.");
+                    }
+                }
+            });
+        });
 
     // Gọi API tìm kiếm
     function searchProducts(keyword) {
@@ -126,7 +158,7 @@
         // Bắt sự kiện submit form tìm kiếm
         $(".searchForm").on("submit", function (e) {
             e.preventDefault();
-            const keyword = $(".searchInput").val().trim();
+            const keyword = $("#searchInput").val().trim();
             if (keyword) {
                 searchProducts(keyword);
             } else {
@@ -134,7 +166,10 @@
             }
         });
 
+
     });
+
 </script>
+<script src="/js/filterPrice.js"></script>
 </body>
 </html>
